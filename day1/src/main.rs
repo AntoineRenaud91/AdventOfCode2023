@@ -8,30 +8,38 @@ const DIGITS: [&str; 10] = [
     "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
 ];
 
-fn sum_values_digit_only(path: impl AsRef<Path>) -> u32 {
+fn process_p1(path: impl AsRef<Path>) -> u32 {
     BufReader::new(File::open(path).unwrap())
         .lines()
         .flatten()
         .fold(0u32, |acc, value| {
-            let first_digit = value.chars().find_map(|c| c.to_digit(10));
-            let last_digit = value.chars().rev().find_map(|c| c.to_digit(10));
-            let number = match (first_digit, last_digit) {
-                (Some(tens), Some(units)) => 10 * tens + units,
-                _ => {
-                    println!("Error occured with value: {value}");
-                    0
-                }
-            };
-            number + acc
+            let mut digits = value.chars().filter_map(|c| c.to_digit(10));
+            let first_digit = digits.next().expect("No digit found");
+            let last_digit = digits.last().unwrap_or(first_digit);
+            acc + 10 * first_digit + last_digit
         })
 }
 
-fn sum_values_all(path: impl AsRef<Path>) -> u32 {
+#[test]
+fn test_process_p1() {
+    let path = std::env::temp_dir().join("testp1.dat");
+    std::fs::write(
+        &path,
+        "1abc2
+        pqr3stu8vwx
+        a1b2c3d4e5f
+        treb7uchet",
+    )
+    .unwrap();
+    assert_eq!(process_p1(path), 142)
+}
+
+fn process_p2(path: impl AsRef<Path>) -> u32 {
     BufReader::new(File::open(path).unwrap())
         .lines()
         .flatten()
         .fold(0u32, |acc, value| {
-            let first_digit = value.chars().enumerate().find_map(|(i, c)| {
+            let mut digits = value.chars().enumerate().filter_map(|(i, c)| {
                 if let Some(n) = c.to_digit(10) {
                     return Some(n);
                 }
@@ -43,36 +51,36 @@ fn sum_values_all(path: impl AsRef<Path>) -> u32 {
                     }
                 })
             });
-            let last_digit = value.chars().rev().enumerate().find_map(|(i, c)| {
-                if let Some(n) = c.to_digit(10) {
-                    return Some(n);
-                }
-                DIGITS.iter().enumerate().find_map(|(n, s)| {
-                    if value[..(value.len() - i)].ends_with(s) {
-                        Some(n as u32)
-                    } else {
-                        None
-                    }
-                })
-            });
-            let number = match (first_digit, last_digit) {
-                (Some(tens), Some(units)) => 10 * tens + units,
-                _ => {
-                    println!("Error occured with value: {value}");
-                    0
-                }
-            };
-            number + acc
+            let first_digit = digits.next().expect("No digit found");
+            let last_digit = digits.last().unwrap_or(first_digit);
+            acc + 10 * first_digit + last_digit
         })
+}
+
+#[test]
+fn test_process_p2() {
+    let path = std::env::temp_dir().join("testp2.dat");
+    std::fs::write(
+        &path,
+        "two1nine
+        eightwothree
+        abcone2threexyz
+        xtwone3four
+        4nineeightseven2
+        zoneight234
+        7pqrstsixteen",
+    )
+    .unwrap();
+    assert_eq!(process_p2(path), 281)
 }
 
 fn main() {
     println!(
         "The result with only digits is {}!",
-        sum_values_digit_only("data/calibration_values.data")
+        process_p1("data/calibration_values.data")
     );
     println!(
         "The corrected result is {}!",
-        sum_values_all("data/calibration_values.data")
+        process_p2("data/calibration_values.data")
     );
 }
