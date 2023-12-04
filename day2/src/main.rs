@@ -107,8 +107,8 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green",
 
 fn main() {
     println!(
-        "The result of p1 is {}",
-        process_p1("data/games.dat", [12, 13, 14])
+        "The result of p1 is {}.",
+        process_p1("data/day2.txt", [12, 13, 14])
     );
-    println!("The result of p2 is {}", process_p2("data/games.dat"));
+    println!("The result of p2 is {}.", process_p2("data/day2.txt"));
 }

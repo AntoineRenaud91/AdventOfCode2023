@@ -75,12 +75,6 @@ fn test_process_p2() {
 }
 
 fn main() {
-    println!(
-        "The result with only digits is {}!",
-        process_p1("data/calibration_values.data")
-    );
-    println!(
-        "The corrected result is {}!",
-        process_p2("data/calibration_values.data")
-    );
+    println!("The result of p1 is {}.", process_p1("data/day1.txt"));
+    println!("The result of p2 is {}.", process_p2("data/day1.txt"));
 }

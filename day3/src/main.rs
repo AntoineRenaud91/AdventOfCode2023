@@ -186,6 +186,6 @@ fn test_process_p2() {
 }
 
 fn main() {
-    println!("The result of p1 is {}", process_p1("data/engineparts.dat"));
-    println!("The result of p2 is {}", process_p2("data/engineparts.dat"));
+    println!("The result of p1 is {}.", process_p1("data/day3.txt"));
+    println!("The result of p2 is {}.", process_p2("data/day3.txt"));
 }
