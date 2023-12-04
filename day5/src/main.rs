@@ -1,54 +1,50 @@
 use std::{
     fs::File,
     io::{BufRead, BufReader},
-    path::Path,
+    path::Path, time::Instant,
 };
 
-fn get_map(lines: &mut impl Iterator<Item = String>) -> Vec<[usize; 3]> {
-    let mut range_map = vec![];
-    for line in lines.by_ref() {
-        if line.is_empty() {
-            break;
-        }
-        let mut nums = line.split(' ').map(|s| s.parse::<usize>().unwrap());
-        let t_start = nums.next().unwrap();
-        let s_start = nums.next().unwrap();
-        let length = nums.next().unwrap();
-        range_map.push([s_start, t_start, length])
-    }
-    lines.next();
-    range_map
+fn parse_line_to_usize(line: &str) -> Vec<usize> {
+    line.split_whitespace().filter_map(|s| s.parse().ok()).collect()
+}
+
+fn get_ranges<I: Iterator<Item = String>>(lines: &mut I) -> Vec<[usize; 3]> {
+    lines
+        .skip(1)
+        .take_while(|line| !line.is_empty())
+        .map(|line| {
+            let nums = parse_line_to_usize(&line);
+            [nums[1], nums[0], nums[2]]
+        })
+        .collect()
 }
 
 fn process_p1(path: impl AsRef<Path>) -> usize {
-    let mut lines = BufReader::new(File::open(path).unwrap()).lines().flatten();
-    let init_nums: Vec<usize> = lines
-        .next()
-        .unwrap()
-        .split_once("seeds: ")
-        .unwrap()
-        .1
-        .split(' ')
-        .map(|s: &str| s.parse::<usize>().unwrap())
-        .collect();
-    lines.nth(1);
-    (0..7)
-        .fold(init_nums, |nums, _| {
-            let map = get_map(&mut lines);
+    let file = File::open(path).expect("Failed to open file");
+    let mut lines = BufReader::new(file).lines().flatten();
+    let initial_values = lines
+        .next().as_ref()
+        .and_then(|line| line.split_once("seeds: "))
+        .map(|(_, values)| parse_line_to_usize(values))
+        .expect("Ill defined seeds"); // process initial values
+    lines.next(); // skip a line
+    (0..7).fold(initial_values, |nums, _| {
+            let ranges = get_ranges(&mut lines);
             nums.into_iter()
                 .map(|i| {
-                    for [s_start, t_start, length] in map.iter() {
-                        if (i >= *s_start) && (i < s_start + length) {
-                            return t_start + (i - s_start);
+                    ranges.iter().find_map(|&[s_start, t_start, length]| {
+                        if i >= s_start && i < s_start + length {
+                            Some(t_start + (i - s_start))
+                        } else {
+                            None
                         }
-                    }
-                    i
-                })
-                .collect()
+                    }).unwrap_or(i)
+            })
+            .collect()
         })
         .into_iter()
         .min()
-        .unwrap()
+        .expect("No seed number")
 }
 
 #[test]
@@ -168,36 +164,33 @@ fn test_map_range() {
 }
 
 fn process_p2(path: impl AsRef<Path>) -> usize {
-    let mut lines = BufReader::new(File::open(path).unwrap()).lines().flatten();
-    let init_nums: Vec<usize> = lines
-        .next()
-        .unwrap()
-        .split_once("seeds: ")
-        .unwrap()
-        .1
-        .split(' ')
-        .map(|s: &str| s.parse::<usize>().unwrap())
-        .collect();
-    let init_nums: Vec<(usize, usize)> =
-        init_nums.chunks(2).map(|nums| (nums[0], nums[1])).collect();
-    lines.nth(1);
+    let file = File::open(path).expect("Failed to open file");
+    let mut lines = BufReader::new(file).lines().flatten();
+    let initial_values = lines
+        .next().as_ref()
+        .and_then(|line| line.split_once("seeds: "))
+        .map(|(_, values)| parse_line_to_usize(values)
+            .chunks(2)
+            .map(|nums| (nums[0], nums[1])).collect::<Vec<_>>())
+        .expect("Ill defined seeds");
+    lines.next(); //skip a line
     (0..7)
-        .fold(init_nums, |nums, _| {
-            let map = get_map(&mut lines);
-            nums.into_iter().fold(vec![], |mut r, (start, length)| {
-                let mut rem = vec![(start, length)];
-                for maprange in map.iter() {
-                    rem = rem.into_iter().fold(vec![], |mut acc, (start, length)| {
-                        let MappedRange { mapped, unmapped } = map_range(start, length, *maprange);
-                        if let Some(v) = mapped {
-                            r.push(v)
-                        };
+        .fold(initial_values, |nums, _| {
+            let map = get_ranges(&mut lines);
+            nums.into_iter().fold(vec![], |mut result, (start, length)| {
+                let mut remaining = vec![(start, length)];
+                for &range in &map {
+                    remaining = remaining.into_iter().fold(vec![], |mut acc, (start, length)| {
+                        let MappedRange { mapped, unmapped } = map_range(start, length, range);
+                        if let Some(mapped_value) = mapped {
+                            result.push(mapped_value);
+                        }
                         acc.extend(unmapped);
                         acc
                     });
                 }
-                r.extend(rem);
-                r
+                result.extend(remaining);
+                result
             })
         })
         .into_iter()
@@ -251,6 +244,11 @@ humidity-to-location map:
 }
 
 fn main() {
-    println!("The result of p1 is {}.", process_p1("data/day5.txt"));
-    println!("The result of p2 is {}.", process_p2("data/day5.txt"));
+    let t0 = Instant::now();
+    let result_p1 = process_p1("data/day5.txt");
+    let t1 = Instant::now();
+    let result_p2 = process_p2("data/day5.txt");
+    let t2 = Instant::now();
+    println!("The result of p1 is {}. ({:?})", result_p1,t1-t0);
+    println!("The result of p2 is {}. ({:?})", result_p2,t2-t1);
 }
