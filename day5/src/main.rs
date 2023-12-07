@@ -1,11 +1,14 @@
 use std::{
     fs::File,
     io::{BufRead, BufReader},
-    path::Path, time::Instant,
+    path::Path,
+    time::Instant,
 };
 
 fn parse_line_to_usize(line: &str) -> Vec<usize> {
-    line.split_whitespace().filter_map(|s| s.parse().ok()).collect()
+    line.split_whitespace()
+        .filter_map(|s| s.parse().ok())
+        .collect()
 }
 
 fn get_ranges<I: Iterator<Item = String>>(lines: &mut I) -> Vec<[usize; 3]> {
@@ -23,24 +26,29 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
     let file = File::open(path).expect("Failed to open file");
     let mut lines = BufReader::new(file).lines().flatten();
     let initial_values = lines
-        .next().as_ref()
+        .next()
+        .as_ref()
         .and_then(|line| line.split_once("seeds: "))
         .map(|(_, values)| parse_line_to_usize(values))
         .expect("Ill defined seeds"); // process initial values
     lines.next(); // skip a line
-    (0..7).fold(initial_values, |nums, _| {
+    (0..7)
+        .fold(initial_values, |nums, _| {
             let ranges = get_ranges(&mut lines);
             nums.into_iter()
                 .map(|i| {
-                    ranges.iter().find_map(|&[s_start, t_start, length]| {
-                        if i >= s_start && i < s_start + length {
-                            Some(t_start + (i - s_start))
-                        } else {
-                            None
-                        }
-                    }).unwrap_or(i)
-            })
-            .collect()
+                    ranges
+                        .iter()
+                        .find_map(|&[s_start, t_start, length]| {
+                            if i >= s_start && i < s_start + length {
+                                Some(t_start + (i - s_start))
+                            } else {
+                                None
+                            }
+                        })
+                        .unwrap_or(i)
+                })
+                .collect()
         })
         .into_iter()
         .min()
@@ -167,31 +175,40 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
     let file = File::open(path).expect("Failed to open file");
     let mut lines = BufReader::new(file).lines().flatten();
     let initial_values = lines
-        .next().as_ref()
+        .next()
+        .as_ref()
         .and_then(|line| line.split_once("seeds: "))
-        .map(|(_, values)| parse_line_to_usize(values)
-            .chunks(2)
-            .map(|nums| (nums[0], nums[1])).collect::<Vec<_>>())
+        .map(|(_, values)| {
+            parse_line_to_usize(values)
+                .chunks(2)
+                .map(|nums| (nums[0], nums[1]))
+                .collect::<Vec<_>>()
+        })
         .expect("Ill defined seeds");
     lines.next(); //skip a line
     (0..7)
         .fold(initial_values, |nums, _| {
             let map = get_ranges(&mut lines);
-            nums.into_iter().fold(vec![], |mut result, (start, length)| {
-                let mut remaining = vec![(start, length)];
-                for &range in &map {
-                    remaining = remaining.into_iter().fold(vec![], |mut acc, (start, length)| {
-                        let MappedRange { mapped, unmapped } = map_range(start, length, range);
-                        if let Some(mapped_value) = mapped {
-                            result.push(mapped_value);
-                        }
-                        acc.extend(unmapped);
-                        acc
-                    });
-                }
-                result.extend(remaining);
-                result
-            })
+            nums.into_iter()
+                .fold(vec![], |mut result, (start, length)| {
+                    let mut remaining = vec![(start, length)];
+                    for &range in &map {
+                        remaining =
+                            remaining
+                                .into_iter()
+                                .fold(vec![], |mut acc, (start, length)| {
+                                    let MappedRange { mapped, unmapped } =
+                                        map_range(start, length, range);
+                                    if let Some(mapped_value) = mapped {
+                                        result.push(mapped_value);
+                                    }
+                                    acc.extend(unmapped);
+                                    acc
+                                });
+                    }
+                    result.extend(remaining);
+                    result
+                })
         })
         .into_iter()
         .map(|(i, _)| i)
@@ -249,6 +266,6 @@ fn main() {
     let t1 = Instant::now();
     let result_p2 = process_p2("data/day5.txt");
     let t2 = Instant::now();
-    println!("The result of p1 is {}. ({:?})", result_p1,t1-t0);
-    println!("The result of p2 is {}. ({:?})", result_p2,t2-t1);
+    println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
+    println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }
