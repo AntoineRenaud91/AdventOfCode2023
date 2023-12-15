@@ -1,6 +1,6 @@
 use std::{path::Path, time::Instant};
 
-use ndarray::{array, concatenate, s, Array2, Axis};
+use ndarray::{concatenate, s, Array2, Axis};
 
 fn process_pattern(pattern: &str) -> Array2<u8> {
     let ncols = pattern.lines().next().unwrap().len();
@@ -36,7 +36,7 @@ fn find_horizontal_reflexion(pattern: &Array2<u8>) -> Option<usize> {
 
 #[test]
 fn test_find_horizontal() {
-    let pattern = array![
+    let pattern = ndarray::array![
         [0, 1, 0, 1, 0],
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0],
@@ -56,14 +56,14 @@ fn find_vertical_reflexion(pattern: &Array2<u8>) -> Option<usize> {
 
 #[test]
 fn test_find_vertical() {
-    let pattern = array![
+    let pattern = ndarray::array![
         [0, 1, 0, 1, 0],
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0],
         [0, 1, 0, 1, 0],
     ];
     assert!(find_vertical_reflexion(&pattern).is_none());
-    let pattern = array![
+    let pattern = ndarray::array![
         [0, 1, 0, 0, 1],
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0],
@@ -138,7 +138,7 @@ fn find_horizontal_reflexion_with_smudge(pattern: &Array2<u8>) -> Option<usize> 
 
 #[test]
 fn test_find_horizontal_smudge() {
-    let pattern = array![
+    let pattern = ndarray::array![
         [0, 1, 0, 1, 0],
         [0, 0, 0, 0, 1],
         [0, 0, 0, 0, 1],
