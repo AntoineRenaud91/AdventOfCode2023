@@ -1,9 +1,4 @@
-use std::{
-    cmp::Reverse,
-    collections::HashSet,
-    path::Path,
-    time::Instant,
-};
+use std::{cmp::Reverse, collections::HashSet, path::Path, time::Instant};
 
 use ndarray::{concatenate, Array2, Axis};
 use std::collections::BinaryHeap;
@@ -63,7 +58,6 @@ impl Ord for Node {
         self.cost.cmp(&other.cost)
     }
 }
-
 
 fn process_p1(path: impl AsRef<Path>) -> usize {
     let city = process_pattern(&std::fs::read_to_string(path).unwrap());
