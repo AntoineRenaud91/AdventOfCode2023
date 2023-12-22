@@ -1,4 +1,4 @@
-use std::{path::Path, time::Instant, collections::{HashMap, HashSet, BTreeMap}, cmp::Ordering};
+use std::{time::Instant, collections::{HashMap, HashSet, BTreeMap}, cmp::Ordering};
 
 #[derive(Debug)]
 enum Dir {

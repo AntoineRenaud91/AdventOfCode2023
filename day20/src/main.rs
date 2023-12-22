@@ -114,7 +114,7 @@ fn lcm_of_iter<I: Iterator<Item = usize>>(numbers: I) -> usize {
 }
 
 /// This is adapted from a solution found on redit. I have yet
-/// to understand the blakc magic behind it.
+/// to understand the black magic behind it.
 fn process_p2(path: impl AsRef<Path>) -> usize {
     let problem = std::fs::read_to_string(path).unwrap();
     let graph = problem
