@@ -55,6 +55,7 @@ struct Rule<'a> {
     dest: Dest<'a>,
 }
 
+#[allow(clippy::type_complexity)]
 fn split_range(
     (i, j): (usize, usize),
     op: Ordering,
