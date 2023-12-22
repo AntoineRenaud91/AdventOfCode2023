@@ -1,14 +1,9 @@
-use std::{
-    collections::HashMap,
-    fs::File,
-    io::{BufRead, BufReader},
-    path::Path,
-};
+use std::{collections::HashMap, time::Instant};
 
-fn process_p1(path: impl AsRef<Path>) -> u32 {
+fn process_p1(data: &str) -> u32 {
     let mut result = 0u32;
-    let mut lines = BufReader::new(File::open(path).unwrap()).lines().flatten();
-    let mut prev_line: Option<String> = None;
+    let mut lines = data.lines();
+    let mut prev_line: Option<&str> = None;
     let mut cur_line = lines.next();
     let mut next_line = lines.next();
     while let Some(s) = cur_line.as_ref() {
@@ -61,10 +56,9 @@ fn process_p1(path: impl AsRef<Path>) -> u32 {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "467..114..
+    assert_eq!(
+        process_p1(
+            "467..114..
 ...*......
 ..35..633.
 ......#...
@@ -73,15 +67,15 @@ fn test_process_p1() {
 ..592.....
 ......755.
 ...$.*....
-.664.598..",
+.664.598.."
+        ),
+        4361
     )
-    .unwrap();
-    assert_eq!(process_p1(path), 4361)
 }
 
-fn process_p2(path: impl AsRef<Path>) -> u32 {
-    let mut lines = BufReader::new(File::open(path).unwrap()).lines().flatten();
-    let mut prev_line: Option<String> = None;
+fn process_p2(data: &str) -> u32 {
+    let mut lines = data.lines();
+    let mut prev_line: Option<&str> = None;
     let mut cur_line = lines.next();
     let mut next_line = lines.next();
     let mut row = 0;
@@ -164,10 +158,9 @@ fn process_p2(path: impl AsRef<Path>) -> u32 {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "467..114..
+    assert_eq!(
+        process_p2(
+            "467..114..
 ...*......
 ..35..633.
 ......#...
@@ -180,12 +173,17 @@ fn test_process_p2() {
 ..........
 ....*10...
 ..10......",
+        ),
+        467935
     )
-    .unwrap();
-    assert_eq!(process_p2(path), 467935)
 }
 
 fn main() {
-    println!("The result of p1 is {}.", process_p1("data/day3.txt"));
-    println!("The result of p2 is {}.", process_p2("data/day3.txt"));
+    let t0 = Instant::now();
+    let result_p1 = process_p1(&std::fs::read_to_string("data/day3.txt").unwrap());
+    let t1 = Instant::now();
+    let result_p2 = process_p2(&std::fs::read_to_string("data/day3.txt").unwrap());
+    let t2 = Instant::now();
+    println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
+    println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }
