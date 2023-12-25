@@ -1,4 +1,7 @@
-use std::{collections::HashMap, path::Path, time::Instant};
+use std::{collections::HashMap, time::Instant};
+
+#[cfg(test)]
+const TEST_CASE: &str = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";
 
 fn hash_string(string: &str) -> usize {
     string
@@ -11,19 +14,13 @@ fn test_hash_string() {
     assert_eq!(hash_string("HASH"), 52)
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    std::fs::read_to_string(path)
-        .unwrap()
-        .split(',')
-        .map(hash_string)
-        .sum()
+fn process_p1(data: &str) -> usize {
+    data.split(',').map(hash_string).sum()
 }
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(&path, "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7").unwrap();
-    assert_eq!(process_p1(path), 1320)
+    assert_eq!(process_p1(TEST_CASE), 1320)
 }
 
 #[derive(Debug)]
@@ -32,10 +29,8 @@ enum Operation {
     Add((usize, String, usize)),
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    std::fs::read_to_string(path)
-        .unwrap()
-        .split(',')
+fn process_p2(data: &str) -> usize {
+    data.split(',')
         .map(|s| match s.split_once('=') {
             Some((label, focal)) => {
                 Operation::Add((hash_string(label), label.to_owned(), focal.parse().unwrap()))
@@ -98,17 +93,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(&path, "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7").unwrap();
-    assert_eq!(process_p2(path), 145)
+    assert_eq!(process_p2(TEST_CASE), 145)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day15.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day15.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day15.txt");
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

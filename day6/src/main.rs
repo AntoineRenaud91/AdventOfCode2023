@@ -1,4 +1,8 @@
-use std::{path::Path, time::Instant};
+use std::time::Instant;
+
+#[cfg(test)]
+const TEST_CASE: &str = "Time:      7  15   30
+Distance:  9  40  200";
 
 fn winable_config(t_race: usize, d_record: usize) -> usize {
     let x = (t_race as f64) / 2.0;
@@ -29,9 +33,8 @@ fn test_winable_config() {
     }
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    let input = std::fs::read_to_string(path).unwrap();
-    let (race_times, record_distances) = input.split_once('\n').unwrap();
+fn process_p1(data: &str) -> usize {
+    let (race_times, record_distances) = data.split_once('\n').unwrap();
     let race_times = race_times
         .split_at(11)
         .1
@@ -51,19 +54,11 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "Time:      7  15   30
-Distance:  9  40  200",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 288)
+    assert_eq!(process_p1(TEST_CASE), 288)
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    let input = std::fs::read_to_string(path).unwrap();
-    let (t_race, d_record) = input.split_once('\n').unwrap();
+fn process_p2(data: &str) -> usize {
+    let (t_race, d_record) = data.split_once('\n').unwrap();
     let t_race = t_race
         .split_at(11)
         .1
@@ -81,22 +76,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "Time:      7  15   30
-Distance:  9  40  200",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 71503)
+    assert_eq!(process_p2(TEST_CASE), 71503)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day6.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day6.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
-    let result_p2 = process_p2("data/day6.txt");
-    let t2 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
+    let result_p2 = process_p2(&data);
+    let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

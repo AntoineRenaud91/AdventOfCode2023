@@ -1,10 +1,13 @@
 use itertools::Itertools;
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-    path::Path,
-    time::Instant,
-};
+use std::time::Instant;
+
+#[cfg(test)]
+const TEST_CASE: &str = "???.### 1,1,3
+.??..??...?##. 1,1,3
+?#?#?#?#?#?#?#? 1,3,1,6
+????.#...#... 4,1,1
+????.######..#####. 1,6,5
+?###???????? 3,2,1";
 
 fn count_valids(record: &str, counts: &[usize]) -> usize {
     let record = format!(".{}", record.trim_matches('.'));
@@ -51,10 +54,8 @@ fn test_count_valid() {
     assert_eq!(count_valids("?###????????", &[3, 2, 1]), 10);
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    BufReader::new(File::open(path).unwrap())
-        .lines()
-        .flatten()
+fn process_p1(data: &str) -> usize {
+    data.lines()
         .map(|l| {
             let (record, counts) = l.split_once(' ').unwrap();
             let record = record.trim_end_matches('.');
@@ -69,24 +70,11 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "???.### 1,1,3
-.??..??...?##. 1,1,3
-?#?#?#?#?#?#?#? 1,3,1,6
-????.#...#... 4,1,1
-????.######..#####. 1,6,5
-?###???????? 3,2,1",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 21)
+    assert_eq!(process_p1(TEST_CASE), 21)
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    BufReader::new(File::open(path).unwrap())
-        .lines()
-        .flatten()
+fn process_p2(data: &str) -> usize {
+    data.lines()
         .map(|l| {
             let (record, counts) = l.split_once(' ').unwrap();
             let counts = counts
@@ -110,26 +98,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "???.### 1,1,3
-.??..??...?##. 1,1,3
-?#?#?#?#?#?#?#? 1,3,1,6
-????.#...#... 4,1,1
-????.######..#####. 1,6,5
-?###???????? 3,2,1",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 525152)
+    assert_eq!(process_p2(TEST_CASE), 525152)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day12.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day12.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day12.txt");
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

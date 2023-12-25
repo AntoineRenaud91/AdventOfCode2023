@@ -4,6 +4,15 @@ use std::{
     time::Instant,
 };
 
+#[cfg(test)]
+const TEST_CASE: &str = "1,0,1~1,2,1
+0,0,2~2,0,2
+0,2,3~2,2,3
+0,0,4~0,2,4
+2,0,5~2,2,5
+0,1,6~2,1,6
+1,1,8~1,1,9";
+
 #[derive(Debug)]
 enum Dir {
     X(usize),
@@ -119,18 +128,7 @@ fn process_p1(data: &str) -> usize {
 
 #[test]
 fn test_process_p1() {
-    assert_eq!(
-        process_p1(
-            "1,0,1~1,2,1
-0,0,2~2,0,2
-0,2,3~2,2,3
-0,0,4~0,2,4
-2,0,5~2,2,5
-0,1,6~2,1,6
-1,1,8~1,1,9"
-        ),
-        5
-    )
+    assert_eq!(process_p1(TEST_CASE), 5)
 }
 
 fn count_fall(
@@ -233,26 +231,16 @@ fn process_p2(data: &str) -> usize {
 
 #[test]
 fn test_process_p2() {
-    assert_eq!(
-        process_p2(
-            "1,0,1~1,2,1
-0,0,2~2,0,2
-0,2,3~2,2,3
-0,0,4~0,2,4
-2,0,5~2,2,5
-0,1,6~2,1,6
-1,1,8~1,1,9"
-        ),
-        7
-    )
+    assert_eq!(process_p2(TEST_CASE), 7)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day22.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1(&std::fs::read_to_string("data/day22.txt").unwrap());
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2(&std::fs::read_to_string("data/day22.txt").unwrap());
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

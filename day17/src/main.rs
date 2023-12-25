@@ -1,8 +1,23 @@
-use std::{cmp::Reverse, collections::HashSet, path::Path, time::Instant};
+use std::{cmp::Reverse, collections::HashSet, time::Instant};
 
 use ndarray::{concatenate, Array2, Axis};
 use std::collections::BinaryHeap;
 use std::hash::Hash;
+
+#[cfg(test)]
+const TEST_CASE: &str = "2413432311323
+3215453535623
+3255245654254
+3446585845452
+4546657867536
+1438598798454
+4457876987766
+3637877979653
+4654967986887
+4564679986453
+1224686865563
+2546548887735
+4322674655533";
 
 fn process_pattern(pattern: &str) -> Array2<usize> {
     let ncols = pattern.lines().next().unwrap().len();
@@ -59,8 +74,8 @@ impl Ord for Node {
     }
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    let city = process_pattern(&std::fs::read_to_string(path).unwrap());
+fn process_p1(data: &str) -> usize {
+    let city = process_pattern(data);
     let nx = city.shape()[0];
     let ny = city.shape()[1];
     let source = (0, 0);
@@ -187,29 +202,11 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "2413432311323
-3215453535623
-3255245654254
-3446585845452
-4546657867536
-1438598798454
-4457876987766
-3637877979653
-4654967986887
-4564679986453
-1224686865563
-2546548887735
-4322674655533",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 102)
+    assert_eq!(process_p1(TEST_CASE), 102)
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    let city = process_pattern(&std::fs::read_to_string(path).unwrap());
+fn process_p2(data: &str) -> usize {
+    let city = process_pattern(data);
     let nx = city.shape()[0];
     let ny = city.shape()[1];
     let source = (0, 0);
@@ -336,33 +333,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "2413432311323
-3215453535623
-3255245654254
-3446585845452
-4546657867536
-1438598798454
-4457876987766
-3637877979653
-4654967986887
-4564679986453
-1224686865563
-2546548887735
-4322674655533",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 94)
+    assert_eq!(process_p2(TEST_CASE), 94)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day17.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day17.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day17.txt");
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

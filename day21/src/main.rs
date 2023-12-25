@@ -1,5 +1,18 @@
 use ndarray::Array2;
-use std::{collections::HashSet, path::Path, time::Instant};
+use std::{collections::HashSet, time::Instant};
+
+#[cfg(test)]
+const TEST_CASE: &str = "...........
+.....###.#.
+.###.##..#.
+..#.#...#..
+....#.#....
+.##..S####.
+.##..#...#.
+.......##..
+.##.#.####.
+.##..##.##.
+...........";
 
 fn process_pattern(s: &str) -> (Array2<bool>, (usize, usize)) {
     let shape = [s.lines().count(), s.lines().next().unwrap().len()];
@@ -23,8 +36,8 @@ fn process_pattern(s: &str) -> (Array2<bool>, (usize, usize)) {
     (array, ind)
 }
 
-fn process_p1(path: impl AsRef<Path>, nstep: usize) -> usize {
-    let (grid, (i, j)) = process_pattern(&std::fs::read_to_string(path).unwrap());
+fn process_p1(data: &str, nstep: usize) -> usize {
+    let (grid, (i, j)) = process_pattern(data);
     (0..nstep)
         .fold(HashSet::from([(i as i32, j as i32)]), |positions, _| {
             positions
@@ -47,30 +60,15 @@ fn process_p1(path: impl AsRef<Path>, nstep: usize) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "...........
-.....###.#.
-.###.##..#.
-..#.#...#..
-....#.#....
-.##..S####.
-.##..#...#.
-.......##..
-.##.#.####.
-.##..##.##.
-...........",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path, 6), 16)
+    assert_eq!(process_p1(TEST_CASE, 6), 16)
 }
 
 /// Part 2 is boring. It requires doing some interpolation of the data..
 
 fn main() {
+    let data = std::fs::read_to_string("data/day22.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day21.txt", 64);
+    let result_p1 = process_p1(&data, 64);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
 }

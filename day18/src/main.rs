@@ -1,9 +1,20 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-    path::Path,
-    time::Instant,
-};
+use std::time::Instant;
+
+#[cfg(test)]
+const TEST_CASE: &str = "R 6 (#70c710)
+D 5 (#0dc571)
+L 2 (#5713f0)
+D 2 (#d2c081)
+R 2 (#59c680)
+D 2 (#411b91)
+L 5 (#8ceee2)
+U 2 (#caa173)
+L 1 (#1b58a2)
+U 2 (#caa171)
+R 2 (#7807d2)
+U 3 (#a77fa3)
+L 2 (#015232)
+U 2 (#7a21e3)";
 
 use geo::{Area, LineString, Polygon};
 
@@ -45,10 +56,9 @@ fn count_inner(line: Vec<(i32, i32)>) -> usize {
     area + boundary_count / 2 + 1
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    let line = BufReader::new(File::open(path).unwrap())
+fn process_p1(data: &str) -> usize {
+    let line = data
         .lines()
-        .flatten()
         .map(|line| {
             let mut iter = line.split_whitespace();
             let dir: Dir = iter.next().unwrap().chars().next().unwrap().into();
@@ -70,26 +80,7 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "R 6 (#70c710)
-D 5 (#0dc571)
-L 2 (#5713f0)
-D 2 (#d2c081)
-R 2 (#59c680)
-D 2 (#411b91)
-L 5 (#8ceee2)
-U 2 (#caa173)
-L 1 (#1b58a2)
-U 2 (#caa171)
-R 2 (#7807d2)
-U 3 (#a77fa3)
-L 2 (#015232)
-U 2 (#7a21e3)",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 62)
+    assert_eq!(process_p1(TEST_CASE), 62)
 }
 
 fn parse_hex(s: &str) -> (Dir, i32) {
@@ -104,10 +95,9 @@ fn test_parse_hex() {
     assert_eq!(parse_hex("(#70c710)"), (Dir::R, 461937));
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    let line = BufReader::new(File::open(path).unwrap())
+fn process_p2(data: &str) -> usize {
+    let line = data
         .lines()
-        .flatten()
         .map(|line| parse_hex(line.split_whitespace().nth(2).unwrap()))
         .fold(vec![(0, 0)], |mut line, (dir, n)| {
             let (i, j) = *line.last().unwrap();
@@ -124,34 +114,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "R 6 (#70c710)
-D 5 (#0dc571)
-L 2 (#5713f0)
-D 2 (#d2c081)
-R 2 (#59c680)
-D 2 (#411b91)
-L 5 (#8ceee2)
-U 2 (#caa173)
-L 1 (#1b58a2)
-U 2 (#caa171)
-R 2 (#7807d2)
-U 3 (#a77fa3)
-L 2 (#015232)
-U 2 (#7a21e3)",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 952408144115)
+    assert_eq!(process_p2(TEST_CASE), 952408144115)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day18.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day18.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day18.txt");
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

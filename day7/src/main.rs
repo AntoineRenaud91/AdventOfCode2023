@@ -1,4 +1,11 @@
-use std::{cmp::Ordering, collections::HashMap, fs::read_to_string, path::Path, time::Instant};
+use std::{cmp::Ordering, collections::HashMap, time::Instant};
+
+#[cfg(test)]
+const TEST_CASE: &str = "32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483";
 
 const CARDS_P1: [char; 13] = [
     '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A',
@@ -20,11 +27,10 @@ fn val_from_counts(counts: &HashMap<char, usize>) -> usize {
         .sum()
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
+fn process_p1(data: &str) -> usize {
     let map_val: HashMap<char, usize> =
         HashMap::from_iter(CARDS_P1.iter().enumerate().map(|(i, c)| (*c, i + 1)));
-    let input = read_to_string(path).unwrap();
-    let mut hands_and_bids = input
+    let mut hands_and_bids = data
         .lines()
         .map(|line| {
             let (hand, bid) = line.split_once(' ').unwrap();
@@ -61,17 +67,7 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "32T3K 765
-T55J5 684
-KK677 28
-KTJJT 220
-QQQJA 483",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 6440)
+    assert_eq!(process_p1(TEST_CASE), 6440)
 }
 
 const CARDS_P2: [char; 13] = [
@@ -91,11 +87,10 @@ fn count_occurences_p2(hand: &str) -> HashMap<char, usize> {
     counts
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
+fn process_p2(data: &str) -> usize {
     let map_val: HashMap<char, usize> =
         HashMap::from_iter(CARDS_P2.iter().enumerate().map(|(i, c)| (*c, i + 1)));
-    let input = read_to_string(path).unwrap();
-    let mut hands_and_bids = input
+    let mut hands_and_bids = data
         .lines()
         .map(|line| {
             let (hand, bid) = line.split_once(' ').unwrap();
@@ -132,25 +127,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "32T3K 765
-T55J5 684
-KK677 28
-KTJJT 220
-QQQJA 483",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 5905)
+    assert_eq!(process_p2(TEST_CASE), 5905)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day7.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day7.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
-    let result_p2 = process_p2("data/day7.txt");
-    let t2 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
+    let result_p2 = process_p2(&data);
+    let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

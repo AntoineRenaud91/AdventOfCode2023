@@ -1,12 +1,24 @@
 use std::{
     collections::{HashMap, VecDeque},
-    path::Path,
     time::Instant,
 };
 
-fn process_p1(path: impl AsRef<Path>, n: usize) -> usize {
-    let problem = std::fs::read_to_string(path).unwrap();
-    let graph = problem
+#[cfg(test)]
+const TEST_CASE_1: &str = "broadcaster -> a, b, c
+%a -> b
+%b -> c
+%c -> inv
+&inv -> a";
+
+#[cfg(test)]
+const TEST_CASE_2: &str = "broadcaster -> a
+%a -> inv, con
+&inv -> b
+%b -> con
+&con -> output";
+
+fn process_p1(data: &str, n: usize) -> usize {
+    let graph = data
         .lines()
         .map(|line| {
             let (module, cables) = line.split_once(" -> ").unwrap();
@@ -73,32 +85,12 @@ fn process_p1(path: impl AsRef<Path>, n: usize) -> usize {
 
 #[test]
 fn test_process_p1_e1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "broadcaster -> a, b, c
-%a -> b
-%b -> c
-%c -> inv
-&inv -> a",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path, 1), 32)
+    assert_eq!(process_p1(TEST_CASE_1, 1), 32)
 }
 
 #[test]
 fn test_process_p1_e2() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "broadcaster -> a
-%a -> inv, con
-&inv -> b
-%b -> con
-&con -> output",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path, 1000), 11687500)
+    assert_eq!(process_p1(TEST_CASE_2, 1000), 11687500)
 }
 
 fn gcd(a: usize, b: usize) -> usize {
@@ -115,9 +107,8 @@ fn lcm_of_iter<I: Iterator<Item = usize>>(numbers: I) -> usize {
 
 /// This is adapted from a solution found on redit. I have yet
 /// to understand the black magic behind it.
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    let problem = std::fs::read_to_string(path).unwrap();
-    let graph = problem
+fn process_p2(data: &str) -> usize {
+    let graph = data
         .lines()
         .map(|line| {
             let (module, cables) = line.split_once(" -> ").unwrap();
@@ -154,11 +145,12 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day20.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day20.txt", 1000);
+    let result_p1 = process_p1(&data, 1000);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day20.txt");
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

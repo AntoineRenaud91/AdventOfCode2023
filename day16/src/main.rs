@@ -1,7 +1,19 @@
-use std::{collections::HashSet, path::Path, time::Instant};
+use std::{collections::HashSet, time::Instant};
 
 use ndarray::{concatenate, Array2, Axis};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
+
+#[cfg(test)]
+const TEST_CASE: &str = r".|...\....
+|.-.\.....
+.....|-...
+........|.
+..........
+.........\
+..../.\\..
+.-.-/..|..
+.|....-|.\
+..//.|....";
 
 fn process_pattern(pattern: &str) -> Array2<char> {
     let ncols = pattern.lines().next().unwrap().len();
@@ -110,8 +122,8 @@ fn get_energized_grid(
     get_energized_grid(grid, egrid, beams, memo)
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    let grid = process_pattern(&std::fs::read_to_string(path).unwrap());
+fn process_p1(data: &str) -> usize {
+    let grid = process_pattern(data);
     let egrid = get_energized_grid(
         &grid,
         Array2::<bool>::from_elem([grid.shape()[0], grid.shape()[1]], false),
@@ -126,26 +138,11 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        r".|...\....
-|.-.\.....
-.....|-...
-........|.
-..........
-.........\
-..../.\\..
-.-.-/..|..
-.|....-|.\
-..//.|....",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 51)
+    assert_eq!(process_p1(TEST_CASE), 46)
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    let grid = process_pattern(&std::fs::read_to_string(path).unwrap());
+fn process_p2(data: &str) -> usize {
+    let grid = process_pattern(data);
     let nrows = grid.shape()[0];
     let ncols = grid.shape()[1];
     let init_beams = (0..nrows)
@@ -193,30 +190,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        r".|...\....
-|.-.\.....
-.....|-...
-........|.
-..........
-.........\
-..../.\\..
-.-.-/..|..
-.|....-|.\
-..//.|....",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 51)
+    assert_eq!(process_p2(TEST_CASE), 51)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day16.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day16.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day16.txt");
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

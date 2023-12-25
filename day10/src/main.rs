@@ -1,6 +1,25 @@
-use std::{path::Path, time::Instant};
+use std::time::Instant;
 
 use geo::{Contains, Coord, LineString, Polygon};
+
+#[cfg(test)]
+const TEST_CASE_1: &str = "..F7.
+.FJ|.
+SJ.L7
+|F--J
+LJ...";
+
+#[cfg(test)]
+const TEST_CASE_2: &str = "FF7FSF7F7F7F7F7F---7
+L|LJ||||||||||||F--J
+FL-7LJLJ||||||LJL-77
+F--JF--7||LJLJIF7FJ-
+L---JF-JLJIIIIFJLJJ7
+|F|F-JF---7IIIL7L|7|
+|FFJF7L7F-JF7IIL---7
+7-L-JL7||F7|L7F-7F7|
+L.L7LFJ|||||FJL7||LJ
+L7JLJL-JLJLJL--JLJ.L";
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 enum From {
@@ -51,9 +70,8 @@ fn length_to_s(
     }
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    let grid = std::fs::read_to_string(path)
-        .unwrap()
+fn process_p1(data: &str) -> usize {
+    let grid = data
         .lines()
         .map(|lines| lines.chars().collect::<Vec<_>>())
         .collect::<Vec<_>>();
@@ -105,17 +123,7 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "..F7.
-.FJ|.
-SJ.L7
-|F--J
-LJ...",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 8)
+    assert_eq!(process_p1(TEST_CASE_1), 8)
 }
 
 fn get_loop(
@@ -160,9 +168,8 @@ fn get_loop(
     }
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    let grid = std::fs::read_to_string(path)
-        .unwrap()
+fn process_p2(data: &str) -> usize {
+    let grid = data
         .lines()
         .map(|lines| lines.chars().collect::<Vec<_>>())
         .collect::<Vec<_>>();
@@ -218,30 +225,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "FF7FSF7F7F7F7F7F---7
-L|LJ||||||||||||F--J
-FL-7LJLJ||||||LJL-77
-F--JF--7||LJLJIF7FJ-
-L---JF-JLJIIIIFJLJJ7
-|F|F-JF---7IIIL7L|7|
-|FFJF7L7F-JF7IIL---7
-7-L-JL7||F7|L7F-7F7|
-L.L7LFJ|||||FJL7||LJ
-L7JLJL-JLJLJL--JLJ.L",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 10)
+    assert_eq!(process_p2(TEST_CASE_2), 10)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day10.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day10.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
-    let result_p2 = process_p2("data/day10.txt");
-    let t2 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
+    let result_p2 = process_p2(&data);
+    let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

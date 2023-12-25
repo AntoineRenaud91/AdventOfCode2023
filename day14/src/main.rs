@@ -1,5 +1,17 @@
 use ndarray::{concatenate, Array1, Array2, Axis};
-use std::{collections::HashMap, path::Path, time::Instant};
+use std::{collections::HashMap, time::Instant};
+
+#[cfg(test)]
+const TEST_CASE: &str = "O....#....
+O.OO#....#
+.....##...
+OO.#O....O
+.O.....O#.
+O.#..O.#.#
+..O..#O..O
+.......O..
+#....###..
+#OO..#....";
 
 fn process_pattern(pattern: &str) -> Array2<u8> {
     let ncols = pattern.lines().next().unwrap().len();
@@ -55,8 +67,8 @@ fn test_process_col() {
     )
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    let mut table = process_pattern(&std::fs::read_to_string(path).unwrap());
+fn process_p1(data: &str) -> usize {
+    let mut table = process_pattern(data);
     table
         .push_row(Array1::from_elem(table.ncols(), 2).view())
         .unwrap();
@@ -65,23 +77,7 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "
-O....#....
-O.OO#....#
-.....##...
-OO.#O....O
-.O.....O#.
-O.#..O.#.#
-..O..#O..O
-.......O..
-#....###..
-#OO..#....",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 136)
+    assert_eq!(process_p1(TEST_CASE), 136)
 }
 
 fn tilt_left(col: Vec<u8>) -> Vec<u8> {
@@ -272,8 +268,8 @@ fn table_load(table: &Array2<u8>) -> usize {
         .sum()
 }
 
-fn process_p2(path: impl AsRef<Path>, n: usize) -> usize {
-    let mut table = process_pattern(&std::fs::read_to_string(path).unwrap());
+fn process_p2(data: &str, n: usize) -> usize {
+    let mut table = process_pattern(data);
     let mut results = vec![table_load(&table)];
     let mut tmap = HashMap::new();
     let mut i = 0;
@@ -291,30 +287,16 @@ fn process_p2(path: impl AsRef<Path>, n: usize) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "O....#....
-O.OO#....#
-.....##...
-OO.#O....O
-.O.....O#.
-O.#..O.#.#
-..O..#O..O
-.......O..
-#....###..
-#OO..#....",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path, 1000), 64)
+    assert_eq!(process_p2(TEST_CASE, 1000), 64)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day14.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day14.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day14.txt", 1000);
+    let result_p2 = process_p2(&data, 1000);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

@@ -1,14 +1,12 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-    path::Path,
-    time::Instant,
-};
+use std::time::Instant;
 
-fn process_p1(path: impl AsRef<Path>) -> i64 {
-    BufReader::new(File::open(path).unwrap())
-        .lines()
-        .flatten()
+#[cfg(test)]
+const TEST_CASE: &str = "0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45";
+
+fn process_p1(data: &str) -> i64 {
+    data.lines()
         .map(|line| {
             let mut nums = vec![line
                 .split_whitespace()
@@ -34,21 +32,11 @@ fn process_p1(path: impl AsRef<Path>) -> i64 {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "0 3 6 9 12 15
-1 3 6 10 15 21
-10 13 16 21 30 45",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 114)
+    assert_eq!(process_p1(TEST_CASE), 114)
 }
 
-fn process_p2(path: impl AsRef<Path>) -> i64 {
-    BufReader::new(File::open(path).unwrap())
-        .lines()
-        .flatten()
+fn process_p2(data: &str) -> i64 {
+    data.lines()
         .map(|line| {
             let mut nums = vec![line
                 .split_whitespace()
@@ -70,23 +58,16 @@ fn process_p2(path: impl AsRef<Path>) -> i64 {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "0 3 6 9 12 15
-1 3 6 10 15 21
-10 13 16 21 30 45",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 2)
+    assert_eq!(process_p2(TEST_CASE), 2)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day9.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day9.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
-    let result_p2 = process_p2("data/day9.txt");
-    let t2 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
+    let result_p2 = process_p2(&data);
+    let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

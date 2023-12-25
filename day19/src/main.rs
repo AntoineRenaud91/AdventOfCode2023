@@ -1,4 +1,23 @@
-use std::{cmp::Ordering, collections::HashMap, path::Path, time::Instant};
+use std::{cmp::Ordering, collections::HashMap, time::Instant};
+
+#[cfg(test)]
+const TEST_CASE: &str = "px{a<2006:qkq,m>2090:A,rfg}
+pv{a>1716:R,A}
+lnx{m>1548:A,A}
+rfg{s<537:gd,x>2440:R,A}
+qs{s>3448:A,lnx}
+qkq{x<1416:A,crn}
+crn{x>2662:A,R}
+in{s<1351:px,qqz}
+qqz{s>2770:qs,m<1801:hdj,R}
+gd{a>3333:R,R}
+hdj{m>838:A,pv}
+
+{x=787,m=2655,a=1222,s=2876}
+{x=1679,m=44,a=2067,s=496}
+{x=2036,m=264,a=79,s=2244}
+{x=2461,m=1339,a=466,s=291}
+{x=2127,m=1623,a=2188,s=1013}";
 
 #[derive(Debug)]
 enum Part {
@@ -159,9 +178,8 @@ fn process_parts(
     process_parts(ruleset, parts, *dest)
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    let problem = std::fs::read_to_string(path).unwrap();
-    let (ruleset, parts) = problem.split_once("\n\n").unwrap();
+fn process_p1(data: &str) -> usize {
+    let (ruleset, parts) = data.split_once("\n\n").unwrap();
     let ruleset = ruleset
         .lines()
         .map(|line| {
@@ -210,29 +228,7 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "px{a<2006:qkq,m>2090:A,rfg}
-pv{a>1716:R,A}
-lnx{m>1548:A,A}
-rfg{s<537:gd,x>2440:R,A}
-qs{s>3448:A,lnx}
-qkq{x<1416:A,crn}
-crn{x>2662:A,R}
-in{s<1351:px,qqz}
-qqz{s>2770:qs,m<1801:hdj,R}
-gd{a>3333:R,R}
-hdj{m>838:A,pv}
-
-{x=787,m=2655,a=1222,s=2876}
-{x=1679,m=44,a=2067,s=496}
-{x=2036,m=264,a=79,s=2244}
-{x=2461,m=1339,a=466,s=291}
-{x=2127,m=1623,a=2188,s=1013}",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 19114)
+    assert_eq!(process_p1(TEST_CASE), 19114)
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -286,9 +282,8 @@ fn get_accepted_combinations(
     count
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    let problem = std::fs::read_to_string(path).unwrap();
-    let (ruleset, _) = problem.split_once("\n\n").unwrap();
+fn process_p2(data: &str) -> usize {
+    let (ruleset, _) = data.split_once("\n\n").unwrap();
     let ruleset = ruleset
         .lines()
         .map(|line| {
@@ -329,52 +324,17 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 }
 
 #[test]
-fn test_simpler() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "in{a<2001:R,bug}
-bug{a>3000:R,A}
-
-",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 4000 * 4000 * 4000 * 1000)
-}
-
-#[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "px{a<2006:qkq,m>2090:A,rfg}
-pv{a>1716:R,A}
-lnx{m>1548:A,A}
-rfg{s<537:gd,x>2440:R,A}
-qs{s>3448:A,lnx}
-qkq{x<1416:A,crn}
-crn{x>2662:A,R}
-in{s<1351:px,qqz}
-qqz{s>2770:qs,m<1801:hdj,R}
-gd{a>3333:R,R}
-hdj{m>838:A,pv}
-
-{x=787,m=2655,a=1222,s=2876}
-{x=1679,m=44,a=2067,s=496}
-{x=2036,m=264,a=79,s=2244}
-{x=2461,m=1339,a=466,s=291}
-{x=2127,m=1623,a=2188,s=1013}",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 167409079868000)
+    assert_eq!(process_p2(TEST_CASE), 167409079868000)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day19.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day19.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day19.txt");
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }

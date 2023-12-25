@@ -1,6 +1,23 @@
-use std::{path::Path, time::Instant};
+use std::time::Instant;
 
 use ndarray::{concatenate, s, Array2, Axis};
+
+#[cfg(test)]
+const TEST_CASE: &str = "#.##..##.
+..#.##.#.
+##......#
+##......#
+..#.##.#.
+..##..##.
+#.#.##.#.
+
+#...##..#
+#....#..#
+..##..###
+#####.##.
+#####.##.
+..##..###
+#....#..#";
 
 fn process_pattern(pattern: &str) -> Array2<u8> {
     let ncols = pattern.lines().next().unwrap().len();
@@ -72,10 +89,8 @@ fn test_find_vertical() {
     assert_eq!(find_vertical_reflexion(&pattern), Some(3))
 }
 
-fn process_p1(path: impl AsRef<Path>) -> usize {
-    std::fs::read_to_string(path)
-        .unwrap()
-        .split("\n\n")
+fn process_p1(data: &str) -> usize {
+    data.split("\n\n")
         .map(process_pattern)
         .map(|pattern| {
             find_horizontal_reflexion(&pattern)
@@ -86,27 +101,7 @@ fn process_p1(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p1() {
-    let path = std::env::temp_dir().join("test_p1.dat");
-    std::fs::write(
-        &path,
-        "#.##..##.
-..#.##.#.
-##......#
-##......#
-..#.##.#.
-..##..##.
-#.#.##.#.
-
-#...##..#
-#....#..#
-..##..###
-#####.##.
-#####.##.
-..##..###
-#....#..#",
-    )
-    .unwrap();
-    assert_eq!(process_p1(path), 405)
+    assert_eq!(process_p1(TEST_CASE), 405)
 }
 
 fn find_horizontal_reflexion_with_smudge(pattern: &Array2<u8>) -> Option<usize> {
@@ -172,10 +167,8 @@ fn find_vertical_reflexion_with_smudge(pattern: &Array2<u8>) -> Option<usize> {
     })
 }
 
-fn process_p2(path: impl AsRef<Path>) -> usize {
-    std::fs::read_to_string(path)
-        .unwrap()
-        .split("\n\n")
+fn process_p2(data: &str) -> usize {
+    data.split("\n\n")
         .map(process_pattern)
         .map(|pattern| {
             find_horizontal_reflexion_with_smudge(&pattern)
@@ -186,35 +179,16 @@ fn process_p2(path: impl AsRef<Path>) -> usize {
 
 #[test]
 fn test_process_p2() {
-    let path = std::env::temp_dir().join("test_p2.dat");
-    std::fs::write(
-        &path,
-        "#.##..##.
-..#.##.#.
-##......#
-##......#
-..#.##.#.
-..##..##.
-#.#.##.#.
-
-#...##..#
-#....#..#
-..##..###
-#####.##.
-#####.##.
-..##..###
-#....#..#",
-    )
-    .unwrap();
-    assert_eq!(process_p2(path), 400)
+    assert_eq!(process_p2(TEST_CASE), 400)
 }
 
 fn main() {
+    let data = std::fs::read_to_string("data/day13.txt").unwrap();
     let t0 = Instant::now();
-    let result_p1 = process_p1("data/day13.txt");
+    let result_p1 = process_p1(&data);
     let t1 = Instant::now();
     println!("The result of p1 is {}. ({:?})", result_p1, t1 - t0);
-    let result_p2 = process_p2("data/day13.txt");
+    let result_p2 = process_p2(&data);
     let t2 = Instant::now();
     println!("The result of p2 is {}. ({:?})", result_p2, t2 - t1);
 }
